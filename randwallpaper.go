@@ -39,7 +39,10 @@ func generateImage(width, height int, rng *rand.Rand) *image.NRGBA {
 	img := image.NewNRGBA(image.Rect(0, 0, width, height))
 	pathLen := len(path)
 	for i, pt := range path {
-		t := float64(i) / float64(pathLen-1)
+		t := 0.0
+		if pathLen > 1 {
+			t = float64(i) / float64(pathLen-1)
+		}
 		c := cm.mapAt(t)
 		img.SetNRGBA(pt.X, pt.Y, color.NRGBA{R: c.R, G: c.G, B: c.B, A: 255})
 	}
@@ -77,7 +80,11 @@ func Generate(width, height int, output string, opts ...Option) error {
 		if err != nil {
 			return fmt.Errorf("randwallpaper: cannot create file: %w", err)
 		}
-		defer f.Close()
+		defer func() {
+			if cerr := f.Close(); cerr != nil {
+				fmt.Fprintf(os.Stderr, "randwallpaper: warning: close failed: %v\n", cerr)
+			}
+		}()
 
 		img := generateImage(width, height, rng)
 		if err := png.Encode(f, img); err != nil {
