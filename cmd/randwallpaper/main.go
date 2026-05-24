@@ -28,6 +28,13 @@ func main() {
 
 	flag.Parse()
 
+	if width <= 0 || height <= 0 {
+		log.Fatalf("width and height must be positive, got %dx%d", width, height)
+	}
+	if count <= 0 {
+		log.Fatalf("count must be positive, got %d", count)
+	}
+
 	var opts []randwallpaper.Option
 	if count > 1 {
 		opts = append(opts, randwallpaper.WithCount(count))
