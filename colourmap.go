@@ -4,8 +4,6 @@ import (
 	"image/color"
 	"math/rand/v2"
 	"sort"
-
-	"google.golang.org/grpc/credentials/local"
 )
 
 type anchor struct {

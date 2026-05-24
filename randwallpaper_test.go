@@ -276,7 +276,11 @@ func TestGeneratePNG(t *testing.T) {
 	if err != nil {
 		t.Fatalf("cannot open generated file: %v", err)
 	}
-	defer f.Close()
+	defer func() {
+		if cerr := f.Close(); cerr != nil {
+			t.Fatalf("close failed: %v", cerr)
+		}
+	}()
 	img, err := png.Decode(f)
 	if err != nil {
 		t.Fatalf("decoding PNG failed: %v", err)
@@ -301,7 +305,9 @@ func TestGenerateCount(t *testing.T) {
 			t.Fatalf("missing batch file %d: %v", i, err)
 		}
 		_, err = png.Decode(f)
-		f.Close()
+		if cerr := f.Close(); cerr != nil {
+			t.Fatalf("close failed: %v", cerr)
+		}
 		if err != nil {
 			t.Fatalf("batch file %d is not valid PNG: %v", i, err)
 		}
@@ -322,9 +328,17 @@ func TestGenerateSeedReproducibility(t *testing.T) {
 	}
 
 	f1, _ := os.Open(filepath.Join(dir1, "img.png"))
-	defer f1.Close()
+	defer func() {
+		if cerr := f1.Close(); cerr != nil {
+			t.Fatalf("close failed: %v", cerr)
+		}
+	}()
 	f2, _ := os.Open(filepath.Join(dir2, "img.png"))
-	defer f2.Close()
+	defer func() {
+		if cerr := f2.Close(); cerr != nil {
+			t.Fatalf("close failed: %v", cerr)
+		}
+	}()
 
 	img1, _ := png.Decode(f1)
 	img2, _ := png.Decode(f2)
@@ -379,7 +393,11 @@ func TestGenerate1x1(t *testing.T) {
 		t.Fatalf("Generate 1x1 failed: %v", err)
 	}
 	f, _ := os.Open(filepath.Join(dir, "one.png"))
-	defer f.Close()
+	defer func() {
+		if cerr := f.Close(); cerr != nil {
+			t.Fatalf("close failed: %v", cerr)
+		}
+	}()
 	img, err := png.Decode(f)
 	if err != nil {
 		t.Fatalf("decoding 1x1 PNG failed: %v", err)

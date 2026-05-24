@@ -70,8 +70,10 @@ type gaussianBlobMask struct {
 func newGaussianBlobMask(width, height int, rng *rand.Rand) *gaussianBlobMask {
 	n := width * height
 	sqrtN := math.Sqrt(float64(n))
-	nCenters := rng.IntN(int(0.5*sqrtN)) + 1
-	sigma := rng.IntN(int(0.2*sqrtN)) + 1
+	centerMax := max(1, int(0.5*sqrtN))
+	sigmaMax := max(1, int(0.2*sqrtN))
+	nCenters := rng.IntN(centerMax) + 1
+	sigma := rng.IntN(sigmaMax) + 1
 
 	img := image.NewGray(image.Rect(0, 0, width, height))
 	for range nCenters {
