@@ -327,21 +327,33 @@ func TestGenerateSeedReproducibility(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	f1, _ := os.Open(filepath.Join(dir1, "img.png"))
+	f1, err := os.Open(filepath.Join(dir1, "img.png"))
+	if err != nil {
+		t.Fatalf("failed to open image: %v", err)
+	}
 	defer func() {
 		if cerr := f1.Close(); cerr != nil {
 			t.Fatalf("close failed: %v", cerr)
 		}
 	}()
-	f2, _ := os.Open(filepath.Join(dir2, "img.png"))
+	f2, err := os.Open(filepath.Join(dir2, "img.png"))
+	if err != nil {
+		t.Fatalf("failed to open image: %v", err)
+	}
 	defer func() {
 		if cerr := f2.Close(); cerr != nil {
 			t.Fatalf("close failed: %v", cerr)
 		}
 	}()
 
-	img1, _ := png.Decode(f1)
-	img2, _ := png.Decode(f2)
+	img1, err := png.Decode(f1)
+	if err != nil {
+		t.Fatalf("failed to decode image 1: %v", err)
+	}
+	img2, err := png.Decode(f2)
+	if err != nil {
+		t.Fatalf("failed to decode image 2: %v", err)
+	}
 
 	b := img1.Bounds()
 	for y := b.Min.Y; y < b.Max.Y; y++ {
