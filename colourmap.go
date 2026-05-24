@@ -4,6 +4,8 @@ import (
 	"image/color"
 	"math/rand/v2"
 	"sort"
+
+	"google.golang.org/grpc/credentials/local"
 )
 
 type anchor struct {
@@ -42,7 +44,11 @@ func (cm colourmap) mapAt(t float64) color.RGBA {
 	for i := 0; i < len(cm.anchors)-1; i++ {
 		a, b := cm.anchors[i], cm.anchors[i+1]
 		if t >= a.pos && t <= b.pos {
-			local := (t - a.pos) / (b.pos - a.pos)
+			den := b.pos - a.pos
+			if den <= 0 {
+				return cm.anchorColor(a)
+			}
+			local := (t - a.pos) / den
 			local = local * local * (3 - 2*local)
 			return color.RGBA{
 				R: uint8(clampF64(a.r + (b.r-a.r)*local) * 255),
