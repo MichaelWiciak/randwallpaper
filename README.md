@@ -2,7 +2,7 @@
 
 Go random wallpaper generator inspired by Python's [`randimage`](https://github.com/nareto/randimage).
 
-Generates unique, procedural wallpapers using a two-step process:
+Generates unique, procedural wallpapers using a three-step process:
 
 1. Create a random mask (grayscale image)
 2. Trace a path through its pixels
@@ -48,10 +48,20 @@ Each pixel in the path gets coloured according to its position: `k / path_length
 
 Every call to `Generate` produces a unique colourmap. No hardcoded colour tables.
 
+## Installation
+
+```bash
+# Install the CLI tool
+go install github.com/MichaelWiciak/randwallpaper/cmd/randwallpaper@latest
+
+# Or add as a dependency in your Go project
+go get github.com/MichaelWiciak/randwallpaper
+```
+
 ## API
 
 ```go
-import "github.com/michaelwiciak/randwallpaper"
+import "github.com/MichaelWiciak/randwallpaper"
 ```
 
 ```go
@@ -130,25 +140,21 @@ All implementation types are unexported:
 
 - `mask` interface - `saltPepperMask`, `normalMask`, `gaussianBlobMask`
 - `path` interface - `epwtPath`, `probabilisticPath`
-- `colourmap` type - `generatecolourmap()`
+- `colourmap` type - `generateColourmap()`
 
 `Generate()` picks randomly among mask and path types, constructs a random colourmap, and wires them together. This keeps the public API minimal (one function, two options) while the internals remain modular and testable.
 
 ## Dependencies
 
 - `github.com/disintegration/imaging` - Gaussian blur for `GaussianBlobMask`
-- Everything else: Go stdlib (`image`, `image/png`, `image/colour`, `math/rand/v2`, `os`, `flag`)
+- Everything else: Go stdlib (`image`, `image/png`, `image/color`, `math/rand/v2`, `os`, `flag`)
 
 ## Development
 
 ```bash
-go mod init github.com/michaelwiciak/randwallpaper
-go get github.com/disintegration/imaging
-go mod tidy
-
-go build ./...              # verify compilation
-go vet ./...                # static analysis
-go test ./...               # run tests
+go build ./...               # verify compilation
+go vet ./...                 # static analysis
+go test ./...                # run tests
 go build ./cmd/randwallpaper # build CLI binary
 go install ./cmd/randwallpaper  # install CLI to $GOPATH/bin
 ```
