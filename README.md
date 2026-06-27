@@ -1,5 +1,11 @@
 # randwallpaper
 
+<div align="center">
+  <img width="400" alt="image" src="example_output/Blood.png">
+  <img width="400" alt="image" src="example_output/Poison.png">
+  <img width="400" alt="image" src="example_output/SunInSpace.png">
+</div>
+
 Go random wallpaper generator inspired by Python's [`randimage`](https://github.com/nareto/randimage).
 
 Generates unique, procedural wallpapers using a three-step process:
