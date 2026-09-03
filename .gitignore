@@ -34,7 +34,3 @@ go.work.sum
 # macOS
 .DS_Store
 
-test_images/*.png
-
-randwallpaper
-
