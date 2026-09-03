@@ -4,6 +4,7 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/MichaelWiciak/randwallpaper.svg)](https://pkg.go.dev/github.com/MichaelWiciak/randwallpaper)
 [![Go Version](https://img.shields.io/github/go-mod/go-version/MichaelWiciak/randwallpaper)](https://go.dev/dl/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 <div align="center">
   <img width="400" alt="image" src="example_output/Blood.png">
   <img width="400" alt="image" src="example_output/Poison.png">
