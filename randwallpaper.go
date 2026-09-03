@@ -1,3 +1,11 @@
+// Package randwallpaper generates unique, procedural wallpapers.
+//
+// A wallpaper is produced in three steps: a random grayscale mask is created,
+// a path is traced through every pixel of the mask, and each pixel's position
+// along the path is mapped to a colour via a procedurally generated colourmap.
+//
+// The public API is minimal: call Generate with a width, height, and output
+// name, optionally configuring the number of images or a random seed.
 package randwallpaper
 
 import (
@@ -11,6 +19,7 @@ import (
 	"time"
 )
 
+// Option configures a call to Generate.
 type Option func(*config)
 
 type config struct {
@@ -18,12 +27,15 @@ type config struct {
 	seed  int64
 }
 
+// WithCount sets the number of images to generate (default 1).
 func WithCount(n int) Option {
 	return func(c *config) {
 		c.count = n
 	}
 }
 
+// WithSeed sets the random seed for reproducible output (default:
+// time.Now().UnixNano()). The same seed and count always produce the same images.
 func WithSeed(seed int64) Option {
 	return func(c *config) {
 		c.seed = seed
