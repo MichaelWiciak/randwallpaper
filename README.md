@@ -11,22 +11,17 @@
   <img width="400" alt="image" src="example_output/SunInSpace.png">
 </div>
 
-Go random wallpaper generator inspired by Python's [`randimage`](https://github.com/nareto/randimage).
+I love clear, detailed, unsmoothed wallpapers/icons but finding ones that fit the random resolutions across my devices (phones, laptops, monitors) has always been a pain. I also love seeing cool patterns emerge from simple rules. This tool exists because I wanted to solve both of those things at once.
 
-Generates unique, procedural wallpapers using a three-step process:
+I came across Python's [`randimage`](https://github.com/nareto/randimage) and the [EPWT papers](https://arxiv.org/abs/0912.4604), and built a batch tool to generate and publish images to a subreddit and a discord server. But the Python library was painfully slow. So I rebuilt the library from scratch in Go, writing as much as I could myself without dependencies. The result ended up being roughly 50x faster over [`randimage`](https://github.com/nareto/randimage). I hope this helps someone.
+
+## What it does
+
+randwallpaper generates unique, procedural wallpapers using a three-step process:
 
 1. Create a random mask (grayscale image)
 2. Trace a path through its pixels
 3. Map path position to colour via a procedurally generated colourmap
-
-## Why Go over Python?
-
-The Python `randimage` is great but has limitations this project addresses:
-
-- Performance - Python's EPWT path-finding loops over every pixel sequentially with set operations. Go is 10-50x faster on the same algorithm with zero effort.
-- Parallel generation - Go's goroutines make generating batches of wallpapers trivially parallel.
-- Single binary CLI - `go install` gives you a static binary with no Python runtime, pip, or virtualenv needed.
-- No dependency hell - stdlib handles image encoding, PNG saving, and math. Only one external dependency (`disintegration/imaging`) for Gaussian blur.
 
 ## How the algorithm works
 
@@ -49,7 +44,7 @@ Given a mask, create a path that visits every pixel exactly once. Two strategies
 | EPWT (Easy Path Wavelet Transform) | Greedy - at each step, pick the unvisited neighbor whose mask value is closest to the current pixel. Tends to follow level curves, producing smooth colour transitions. |
 | Probabilistic                      | Stochastic - pick a random unvisited neighbor weighted by mask values. Produces noisier, more chaotic patterns.                                                         |
 
-### 3. colourmap
+### 3. Colourmap
 
 Each pixel in the path gets coloured according to its position: `k / path_length` maps to a colour via a procedural colourmap. colourmaps are generated dynamically by:
 
@@ -57,7 +52,7 @@ Each pixel in the path gets coloured according to its position: `k / path_length
 2. Assigning each anchor a random RGB colour
 3. Interpolating between anchors using smooth (cubic Hermite) interpolation
 
-Every call to `Generate` produces a unique colourmap. No hardcoded colour tables.
+Every call to `Generate` produces a unique colourmap.
 
 ## Installation
 
@@ -67,6 +62,43 @@ go install github.com/MichaelWiciak/randwallpaper/cmd/randwallpaper@latest
 
 # Or add as a dependency in your Go project
 go get github.com/MichaelWiciak/randwallpaper
+```
+
+`go install` places the binary in `$GOPATH/bin` (usually `~/go/bin` on macOS/Linux). Make sure this directory is in your `PATH`:
+
+```bash
+# Add to ~/.zshrc or ~/.bashrc
+export PATH="$PATH:$HOME/go/bin"
+```
+
+Then verify it works:
+
+```bash
+randwallpaper -version
+```
+
+## CLI
+
+```
+randwallpaper -width 1920 -height 1080 -out wallpaper
+randwallpaper -w 1920 -h 1080 -out batch -count 10
+randwallpaper -w 800 -h 600 -out test -seed 42
+```
+
+```
+Usage of randwallpaper:
+  -count int
+        number of images to generate (default 1)
+  -height int
+        image height (default 1080)
+  -out string
+        output file name (without extension) (default "wallpaper")
+  -seed int
+        random seed (0 = random) (default 0)
+  -version
+        print version and exit
+  -width int
+        image width (default 1920)
 ```
 
 ## API
@@ -108,28 +140,6 @@ err := randwallpaper.Generate(3840, 2160, "batch", randwallpaper.WithCount(10))
 err := randwallpaper.Generate(800, 600, "fixed", randwallpaper.WithSeed(42))
 ```
 
-## CLI
-
-```
-randwallpaper -width 1920 -height 1080 -out wallpaper
-randwallpaper -w 1920 -h 1080 -out batch -count 10
-randwallpaper -w 800 -h 600 -out test -seed 42
-```
-
-```
-Usage of randwallpaper:
-  -count int
-        number of images to generate (default 1)
-  -height int
-        image height (default 1080)
-  -out string
-        output file name (without extension) (default "wallpaper")
-  -seed int
-        random seed (0 = random) (default 0)
-  -width int
-        image width (default 1920)
-```
-
 ## Project structure
 
 ```
@@ -162,13 +172,21 @@ All implementation types are unexported:
 
 ## Development
 
+Run the CLI directly from the repo without building first:
+
 ```bash
-go build ./...               # verify compilation
-go vet ./...                 # static analysis
-go test ./...                # run tests
-go build ./cmd/randwallpaper # build CLI binary
-go install ./cmd/randwallpaper  # install CLI to $GOPATH/bin
+go run ./cmd/randwallpaper -out test -count 5
+go run ./cmd/randwallpaper -version
 ```
+
+Run checks:
+
+```bash
+go vet ./...                 # static analysis
+go test -race ./...          # run tests with race detector
+```
+
+Generated images are gitignore.
 
 ## License
 
