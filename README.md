@@ -1,5 +1,15 @@
 # randwallpaper
 
+[![CI](https://github.com/MichaelWiciak/randwallpaper/actions/workflows/ci.yml/badge.svg)](https://github.com/MichaelWiciak/randwallpaper/actions/workflows/ci.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/MichaelWiciak/randwallpaper.svg)](https://pkg.go.dev/github.com/MichaelWiciak/randwallpaper)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/MichaelWiciak/randwallpaper)](https://go.dev/dl/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+<div align="center">
+  <img width="400" alt="image" src="example_output/Blood.png">
+  <img width="400" alt="image" src="example_output/Poison.png">
+  <img width="400" alt="image" src="example_output/SunInSpace.png">
+</div>
+
 Go random wallpaper generator inspired by Python's [`randimage`](https://github.com/nareto/randimage).
 
 Generates unique, procedural wallpapers using a three-step process:
@@ -158,6 +168,10 @@ go test ./...                # run tests
 go build ./cmd/randwallpaper # build CLI binary
 go install ./cmd/randwallpaper  # install CLI to $GOPATH/bin
 ```
+
+## License
+
+Released under the [MIT License](LICENSE). Copyright (c) 2026 Michael Wiciak.
 
 ## References
 
