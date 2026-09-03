@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/MichaelWiciak/randwallpaper/compare/v1.0.0...v1.1.0) (2026-09-03)
+
+
+### Features
+
+* add version flag ([8b5ed3d](https://github.com/MichaelWiciak/randwallpaper/commit/8b5ed3d2bc85103c1b725d8e2ab387b76c3e5198))
+
 ## 1.0.0 (2026-09-03)
 
 
