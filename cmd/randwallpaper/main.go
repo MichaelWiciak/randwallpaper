@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime/debug"
 
 	randwallpaper "github.com/MichaelWiciak/randwallpaper"
 )
@@ -12,6 +13,7 @@ import (
 func main() {
 	var width, height, count, seed int
 	var output string
+	var showVersion bool
 
 	flag.IntVar(&width, "width", 1920, "image width")
 	flag.IntVar(&width, "w", 1920, "image width (shorthand)")
@@ -20,6 +22,7 @@ func main() {
 	flag.StringVar(&output, "out", "wallpaper", "output file name (without extension)")
 	flag.IntVar(&count, "count", 1, "number of images to generate")
 	flag.IntVar(&seed, "seed", 0, "random seed (0 = random)")
+	flag.BoolVar(&showVersion, "version", false, "print version and exit")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [options]\n\n", os.Args[0])
@@ -27,6 +30,15 @@ func main() {
 	}
 
 	flag.Parse()
+
+	if showVersion {
+		version := "dev"
+		if info, ok := debug.ReadBuildInfo(); ok && info.Main.Version != "" {
+			version = info.Main.Version
+		}
+		fmt.Println(version)
+		return
+	}
 
 	if width <= 0 || height <= 0 {
 		log.Fatalf("width and height must be positive, got %dx%d", width, height)
