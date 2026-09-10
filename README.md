@@ -6,9 +6,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 <div align="center">
-  <img width="400" alt="image" src="example_output/Blood.png">
-  <img width="400" alt="image" src="example_output/Poison.png">
-  <img width="400" alt="image" src="example_output/SunInSpace.png">
+  <img width="400" alt="image" src="example_output/a1.png">
+  <img width="400" alt="image" src="example_output/a2.png">
+  <img width="400" alt="image" src="example_output/a3.png">
 </div>
 
 I love clear, detailed, unsmoothed wallpapers/icons but finding ones that fit the random resolutions across my devices (phones, laptops, monitors) has always been a pain. I also love seeing cool patterns emerge from simple rules. This tool exists because I wanted to solve both of those things at once.
