@@ -18,7 +18,7 @@ profile.cov
 # Generated images (keep example_output/)
 *.png
 !example_output/
-
+!example_output/*.png
 # Go workspace file
 go.work
 go.work.sum
