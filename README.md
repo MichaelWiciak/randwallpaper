@@ -59,8 +59,9 @@ Every call to `Generate` produces a unique colourmap.
 ### Homebrew
 
 ```bash
-brew tap MichaelWiciak/tap
-brew install randwallpaper
+brew tap michaelwiciak/tap
+brew trust michaelwiciak/tap
+brew install michaelwiciak/tap/randwallpaper
 ```
 
 ### Go install
