@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1](https://github.com/MichaelWiciak/randwallpaper/compare/v1.1.0...v1.1.1) (2026-09-15)
+
+
+### Bug Fixes
+
+* homebrew install ([78f5cfc](https://github.com/MichaelWiciak/randwallpaper/commit/78f5cfc5c872c60f6b2fd705c41f06fbda4f2060))
+* homebrew install ([8b3b1be](https://github.com/MichaelWiciak/randwallpaper/commit/8b3b1be0b2aacdbc2c964a46211f2e9bd9bc6a97))
+
 ## [1.1.0](https://github.com/MichaelWiciak/randwallpaper/compare/v1.0.0...v1.1.0) (2026-09-03)
 
 
