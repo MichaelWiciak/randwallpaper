@@ -10,6 +10,8 @@ import (
 	randwallpaper "github.com/MichaelWiciak/randwallpaper"
 )
 
+var version = "dev"
+
 func main() {
 	var width, height, count, seed int
 	var output string
@@ -32,8 +34,7 @@ func main() {
 	flag.Parse()
 
 	if showVersion {
-		version := "dev"
-		if info, ok := debug.ReadBuildInfo(); ok && info.Main.Version != "" {
+		if info, ok := debug.ReadBuildInfo(); ok && info.Main.Version != "" && info.Main.Version != "(devel)" {
 			version = info.Main.Version
 		}
 		fmt.Println(version)
