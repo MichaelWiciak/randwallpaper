@@ -56,6 +56,15 @@ Every call to `Generate` produces a unique colourmap.
 
 ## Installation
 
+### Homebrew
+
+```bash
+brew tap MichaelWiciak/tap
+brew install randwallpaper
+```
+
+### Go install
+
 ```bash
 # Install the CLI tool
 go install github.com/MichaelWiciak/randwallpaper/cmd/randwallpaper@latest
@@ -76,6 +85,14 @@ Then verify it works:
 ```bash
 randwallpaper -version
 ```
+
+## Releasing a new version
+
+When cutting a new release, update the Homebrew formula in the [homebrew-tap](https://github.com/MichaelWiciak/homebrew-tap) repository:
+
+1. Bump the `url` in `randwallpaper.rb` to the new version tag
+2. Update the `sha256` to match the new tarball
+3. Commit and push — the tap picks it up automatically
 
 ## CLI
 
