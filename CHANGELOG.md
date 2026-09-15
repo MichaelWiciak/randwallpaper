@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.2](https://github.com/MichaelWiciak/randwallpaper/compare/v1.1.1...v1.1.2) (2026-09-15)
+
+
+### Bug Fixes
+
+* add version to ldflags ([35d61bf](https://github.com/MichaelWiciak/randwallpaper/commit/35d61bf3d6febe03e9ef73d869c7484e29d984d6))
+* add version to ldflags ([6aeb3bf](https://github.com/MichaelWiciak/randwallpaper/commit/6aeb3bfa6be4733f76cdc770f3675cad6b1d90ad))
+
 ## [1.1.1](https://github.com/MichaelWiciak/randwallpaper/compare/v1.1.0...v1.1.1) (2026-09-15)
 
 
