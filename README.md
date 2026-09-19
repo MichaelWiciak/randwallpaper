@@ -29,7 +29,7 @@ randwallpaper generates unique, procedural wallpapers using a three-step process
 
 ### 1. Mask generation
 
-A mask is a grayscale image of the same dimensions as the final wallpaper. It determines the "terrain" the path will follow. There are three randomly chosen strategies used by randwallpeper:
+A mask is a grayscale image of the same dimensions as the final wallpaper. It determines the "terrain" the path will follow. There are three randomly chosen strategies used by randwallpaper:
 
 | Mask         | Description                                                                                                                                      |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
