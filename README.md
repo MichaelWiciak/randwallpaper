@@ -11,9 +11,11 @@
   <img width="400" alt="image" src="example_output/a3.png">
 </div>
 
-I love clear, detailed, unsmoothed wallpapers/icons but finding ones that fit the random resolutions across my devices (phones, laptops, monitors) has always been a pain. I also love seeing cool patterns emerge from simple rules. This tool exists because I wanted to solve both of those things at once.
+I love clear, detailed, unsmoothed wallpapers/icons but finding ones that fit the random resolutions across my devices (phones, laptops, monitors) has always been a pain. And I love seeing cool patterns emerge from simple rules. This tool exists because I wanted to solve both of those things at once.
 
-I came across Python's [`randimage`](https://github.com/nareto/randimage) and the [EPWT papers](https://arxiv.org/abs/0912.4604), and built a batch tool to generate and publish images to a subreddit and a discord server. But the Python library was painfully slow. So I rebuilt the library from scratch in Go, writing as much as I could myself without dependencies. The result ended up being roughly 50x faster over [`randimage`](https://github.com/nareto/randimage). I hope this helps someone.
+I came across Python's [`randimage`](https://github.com/nareto/randimage) and the [EPWT papers](https://arxiv.org/abs/0912.4604), and built a batch tool to generate and publish images to a subreddit and a discord server. But the Python library was painfully slow. So I rebuilt the library from scratch in Go, writing as much as I could myself relying on dependencies that would do most of the work for me. The result ended up being roughly 50x faster over [`randimage`](https://github.com/nareto/randimage).
+
+I hope someone else will find this useful.
 
 ## What it does
 
@@ -27,26 +29,26 @@ randwallpaper generates unique, procedural wallpapers using a three-step process
 
 ### 1. Mask generation
 
-A mask is a grayscale image of the same dimensions as the final wallpaper. It determines the "terrain" the path will follow. Three strategies:
+A mask is a grayscale image of the same dimensions as the final wallpaper. It determines the "terrain" the path will follow. There are three randomly chosen strategies used by randwallpaper:
 
-| Mask         | Description                                                                                                                                         |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| SaltPepper   | Random binary noise - each pixel is 0 or 1. Produces high-contrast, jagged patterns.                                                                |
-| Normal       | Gaussian noise - each pixel drawn from N(0,1). Smooth random noise.                                                                                 |
-| GaussianBlob | Random centers placed in the image, blurred with a Gaussian filter. Produces organic, blob-like gradients. Most commonly produces pleasing results. |
+| Mask         | Description                                                                                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| SaltPepper   | Random binary noise as each pixel is a 0 or 1, which produces high-contrast, jagged patterns.                                                    |
+| Normal       | Gaussian noise so each pixel is drawn from N(0,1), producing smooth random patterns                                                              |
+| GaussianBlob | Random centers placed in the image, blurred with a Gaussian filter, which produces blob-like gradients. Usually, this produces the best results. |
 
 ### 2. Path finding
 
-Given a mask, create a path that visits every pixel exactly once. Two strategies, both starting from a random point and expanding outward in concentric square neighborhoods:
+Given a mask, create a path that visits every pixel exactly once. There are two randomly chosen strategies for this, both starting from a random point and expanding outward in concentric square neighborhoods:
 
-| Path                               | Strategy                                                                                                                                                                |
-| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| EPWT (Easy Path Wavelet Transform) | Greedy - at each step, pick the unvisited neighbor whose mask value is closest to the current pixel. Tends to follow level curves, producing smooth colour transitions. |
-| Probabilistic                      | Stochastic - pick a random unvisited neighbor weighted by mask values. Produces noisier, more chaotic patterns.                                                         |
+| Path                               | Strategy                                                                                                                                                                                |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| EPWT (Easy Path Wavelet Transform) | Greedy algorithm as at each step it picks the unvisited neighbor whose mask value is closest to the current pixel, tending to follow level curves, producing smooth colour transitions. |
+| Probabilistic                      | Stochastic approach as it picks a random unvisited neighbor weighted by mask values, producing noisier/chaotic patterns.                                                                |
 
 ### 3. Colourmap
 
-Each pixel in the path gets coloured according to its position: `k / path_length` maps to a colour via a procedural colourmap. colourmaps are generated dynamically by:
+Each pixel in the path gets coloured according to its position. `k / path_length` maps to a colour via a procedural colourmap. colourmaps are generated dynamically by:
 
 1. Picking 3-7 random anchor positions in [0, 1]
 2. Assigning each anchor a random RGB colour
@@ -81,12 +83,6 @@ go get github.com/MichaelWiciak/randwallpaper
 export PATH="$PATH:$HOME/go/bin"
 ```
 
-Then verify it works:
-
-```bash
-randwallpaper -version
-```
-
 ## CLI
 
 ```
@@ -94,6 +90,8 @@ randwallpaper -width 1920 -height 1080 -out wallpaper
 randwallpaper -w 1920 -h 1080 -out batch -count 10
 randwallpaper -w 800 -h 600 -out test -seed 42
 ```
+
+There is a `-help` flag that specifies the usage of the binary.
 
 ```
 Usage of randwallpaper:
@@ -120,8 +118,8 @@ import "github.com/MichaelWiciak/randwallpaper"
 ```go
 // Generate creates wallpapers and saves them as PNG files.
 //
-//   output="wallpaper" with count=1   → saves as wallpaper.png
-//   output="wallpaper" with count=5   → creates folder wallpaper/
+//   output="wallpaper" with count=1   -> saves as wallpaper.png
+//   output="wallpaper" with count=5   -> creates folder wallpaper/
 //                                        with wallpaper_1.png ... wallpaper_5.png
 //
 func Generate(width, height int, output string, opts ...Option) error
@@ -165,24 +163,13 @@ randwallpaper/
         └── main.go         # CLI binary
 ```
 
-## Internal design
-
-All implementation types are unexported:
-
-- `mask` interface - `saltPepperMask`, `normalMask`, `gaussianBlobMask`
-- `path` interface - `epwtPath`, `probabilisticPath`
-- `colourmap` type - `generateColourmap()`
-
-`Generate()` picks randomly among mask and path types, constructs a random colourmap, and wires them together. This keeps the public API minimal (one function, two options) while the internals remain modular and testable.
-
 ## Dependencies
 
 - `github.com/disintegration/imaging` - Gaussian blur for `GaussianBlobMask`
-- Everything else: Go stdlib (`image`, `image/png`, `image/color`, `math/rand/v2`, `os`, `flag`)
 
 ## Development
 
-Run the CLI directly from the repo without building first:
+Run the CLI directly from the repo without building the binary every time:
 
 ```bash
 go run ./cmd/randwallpaper -out test -count 5
@@ -192,11 +179,11 @@ go run ./cmd/randwallpaper -version
 Run checks:
 
 ```bash
-go vet ./...                 # static analysis
-go test -race ./...          # run tests with race detector
+go vet ./...
+go test -race ./...
 ```
 
-Generated images are gitignore.
+Generated images are automatically gitignored.
 
 ## License
 
