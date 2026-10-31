@@ -48,7 +48,7 @@ Given a mask, create a path that visits every pixel exactly once. There are two 
 
 ### 3. Colourmap
 
-Each pixel in the path gets coloured according to its position. `k / path_length` maps to a colour via a procedural colourmap. colourmaps are generated dynamically by:
+Each pixel in the path gets coloured according to its position, from `0` at the first pixel to `1` at the last. That position maps to a colour via a procedural colourmap. Colourmaps are generated dynamically by:
 
 1. Picking 3-7 random anchor positions in [0, 1]
 2. Assigning each anchor a random RGB colour
@@ -57,6 +57,8 @@ Each pixel in the path gets coloured according to its position. `k / path_length
 Every call to `Generate` produces a unique colourmap.
 
 ## Installation
+
+Requires Go 1.22 or later when installing with `go install` or building from source.
 
 ### Homebrew
 
@@ -91,22 +93,27 @@ randwallpaper -w 1920 -h 1080 -out batch -count 10
 randwallpaper -w 800 -h 600 -out test -seed 42
 ```
 
-There is a `-help` flag that specifies the usage of the binary.
+There is a `-help` flag that specifies the usage of the binary. `-w` and `-h` are shorthands for `-width` and `-height`.
 
 ```
-Usage of randwallpaper:
+Usage: randwallpaper [options]
+
   -count int
-        number of images to generate (default 1)
+    	number of images to generate (default 1)
+  -h int
+    	image height (shorthand) (default 1080)
   -height int
-        image height (default 1080)
+    	image height (default 1080)
   -out string
-        output file name (without extension) (default "wallpaper")
+    	output file name (without extension) (default "wallpaper")
   -seed int
-        random seed (0 = random) (default 0)
+    	random seed (0 = random)
   -version
-        print version and exit
+    	print version and exit
+  -w int
+    	image width (shorthand) (default 1920)
   -width int
-        image width (default 1920)
+    	image width (default 1920)
 ```
 
 ## API
@@ -157,10 +164,12 @@ randwallpaper/
 ├── mask.go                 # mask interface + SaltPepper, Normal, GaussianBlob
 ├── path.go                 # path interface + EPWT, Probabilistic
 ├── colourmap.go            # colourmap type + procedural colourmap generation
-├── randwallpaper_test.go   # tests
+├── randwallpaper_test.go   # unit and integration tests
+├── fuzz_test.go            # path/colourmap property and fuzz tests
 └── cmd/
     └── randwallpaper/
-        └── main.go         # CLI binary
+        ├── main.go         # CLI binary
+        └── main_test.go    # CLI tests
 ```
 
 ## Dependencies
@@ -179,11 +188,21 @@ go run ./cmd/randwallpaper -version
 Run checks:
 
 ```bash
+gofmt -l .
 go vet ./...
 go test -race ./...
+go run honnef.co/go/tools/cmd/staticcheck@v0.8.2 ./...
+go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
 ```
 
-Generated images are automatically gitignored.
+Fuzz the path and colourmap invariants:
+
+```bash
+go test -run=^$ -fuzz=FuzzPathCoverage -fuzztime=30s .
+go test -run=^$ -fuzz=FuzzColourmap -fuzztime=30s .
+```
+
+CI runs these checks on Linux, macOS, and Windows, plus the latest stable Go release. Generated images are automatically gitignored.
 
 ## License
 
