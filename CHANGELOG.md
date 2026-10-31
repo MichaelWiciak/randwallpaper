@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.2.0](https://github.com/MichaelWiciak/randwallpaper/compare/v1.1.2...v1.2.0) (2026-10-31)
+
+
+### Features
+
+* add fuzzy tests ([11a34cb](https://github.com/MichaelWiciak/randwallpaper/commit/11a34cb669f94982952d89a271a8126d2f933925))
+* add pull request template ([a53659b](https://github.com/MichaelWiciak/randwallpaper/commit/a53659be6269ddef142458fe13fd74e1550d7dc8))
+* add testing to cli tool ([9e8d2e2](https://github.com/MichaelWiciak/randwallpaper/commit/9e8d2e221eed7116758ef9f56659192dc338a248))
+* add windows, mac, ubuntu tests + static analysis + version compatability ([83b9a34](https://github.com/MichaelWiciak/randwallpaper/commit/83b9a34cee9bab00bba5f1dd6f726613ecd7edd6))
+
+
+### Bug Fixes
+
+* overly restrictive gitignore ([8e53646](https://github.com/MichaelWiciak/randwallpaper/commit/8e53646aa5343cf82df4ced743a9d905d5fccf46))
+
 ## [1.1.2](https://github.com/MichaelWiciak/randwallpaper/compare/v1.1.1...v1.1.2) (2026-09-15)
 
 
