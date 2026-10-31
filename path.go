@@ -12,9 +12,9 @@ type path interface {
 }
 
 type basePath struct {
-	mask        mask
-	width       int
-	height      int
+	mask       mask
+	width      int
+	height     int
 	maxX, maxY int
 }
 
