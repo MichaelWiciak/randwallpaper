@@ -7,7 +7,7 @@ import (
 )
 
 type anchor struct {
-	pos    float64
+	pos     float64
 	r, g, b float64
 }
 
@@ -49,9 +49,9 @@ func (cm colourmap) mapAt(t float64) color.RGBA {
 			local := (t - a.pos) / den
 			local = local * local * (3 - 2*local)
 			return color.RGBA{
-				R: uint8(clampF64(a.r + (b.r-a.r)*local) * 255),
-				G: uint8(clampF64(a.g + (b.g-a.g)*local) * 255),
-				B: uint8(clampF64(a.b + (b.b-a.b)*local) * 255),
+				R: uint8(clampF64(a.r+(b.r-a.r)*local) * 255),
+				G: uint8(clampF64(a.g+(b.g-a.g)*local) * 255),
+				B: uint8(clampF64(a.b+(b.b-a.b)*local) * 255),
 				A: 255,
 			}
 		}

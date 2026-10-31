@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in contributing to `randwallpaper`! This project is small and friendly — bug reports, feature requests, and pull requests are all welcome.
+Thanks for your interest in contributing to `randwallpaper`! This project is small and developing. Bug reports, feature requests, and pull requests are all very welcome.
 
 ## Getting started
 
@@ -12,19 +12,19 @@ go test ./...
 go build ./cmd/randwallpaper
 
 # Static analysis
+gofmt -l .
 go vet ./...
-
-# Optional: stronger linter (also run in CI)
-go run honnef.co/go/tools/cmd/staticcheck@latest ./...
+go run honnef.co/go/tools/cmd/staticcheck@v0.8.2 ./...
+go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
 ```
 
 ## Development workflow
 
 1. Create a feature branch from `main`.
 2. Make your changes and add tests where appropriate.
-3. Run `go test ./...` and `go vet ./...` locally to make sure everything passes.
+3. Run `gofmt`, `go vet ./...`, and `go test -race ./...` locally to make sure everything passes.
 4. Open a pull request against `main`.
-5. CI runs `go vet`, `staticcheck`, and `go test -race` on every pull request.
+5. CI runs `gofmt`, `go vet`, `staticcheck`, `govulncheck`, and `go test -race` on Linux, macOS, and Windows, plus the latest stable Go release.
 
 ## Commit messages
 
@@ -49,8 +49,3 @@ A `!` after the type (e.g. `feat!:` or `refactor!:`) or a
 - Run `gofmt` on your changes.
 - Follow the existing comment style: exported identifiers get doc comments
   starting with the identifier name.
-
-## Reporting issues
-
-Please include the Go version (`go version`) and, if useful, the command or
-code you ran and the expected vs. actual output.
