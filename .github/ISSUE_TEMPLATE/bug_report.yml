@@ -1,0 +1,70 @@
+name: Bug report
+description: Report a reproducible problem with randwallpaper
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please include enough detail to reproduce it.
+  - type: input
+    id: version
+    attributes:
+      label: randwallpaper version
+      description: Output of `randwallpaper -version`, or the commit/install method used.
+      placeholder: "1.1.2"
+    validations:
+      required: true
+  - type: input
+    id: go-version
+    attributes:
+      label: Go version
+      description: Output of `go version` (if building or running from source).
+      placeholder: "go version go1.22.12 linux/amd64"
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Installation method
+      options:
+        - Homebrew
+        - go install
+        - Built from source
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: "macOS 15, Ubuntu 24.04, Windows 11"
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command or code to reproduce
+      description: Include the exact flags, seed, and output path when possible.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include error messages, stack traces, or a description of the output.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else that might help, such as whether the issue is reproducible with a specific seed.
+    validations:
+      required: false
