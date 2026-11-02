@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/MichaelWiciak/randwallpaper/compare/v1.2.0...v1.2.1) (2026-11-02)
+
+
+### Bug Fixes
+
+* add codecov into readme ([e242feb](https://github.com/MichaelWiciak/randwallpaper/commit/e242feb70712862f32c763e76342b071baec1fd0))
+
 ## [1.2.0](https://github.com/MichaelWiciak/randwallpaper/compare/v1.1.2...v1.2.0) (2026-10-31)
 
 
