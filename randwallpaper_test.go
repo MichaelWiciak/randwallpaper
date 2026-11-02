@@ -340,6 +340,32 @@ func TestGenerateCount(t *testing.T) {
 	}
 }
 
+func TestGenerateBatchRejectsEmptyBasename(t *testing.T) {
+	tests := []struct {
+		name   string
+		output string
+	}{
+		{name: "extension only", output: ".png"},
+		{name: "extension only in directory", output: filepath.Join("pictures", ".png")},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			dir := t.TempDir()
+			err := Generate(8, 8, filepath.Join(dir, tc.output), WithCount(2), WithSeed(42))
+			if err == nil {
+				t.Fatalf("Generate(%q) = nil, expected an error", tc.output)
+			}
+			entries, readErr := os.ReadDir(dir)
+			if readErr != nil {
+				t.Fatalf("cannot read output directory: %v", readErr)
+			}
+			if len(entries) != 0 {
+				t.Fatalf("expected no files or directories to be created, got %v", entries)
+			}
+		})
+	}
+}
+
 func TestGenerateSeedReproducibility(t *testing.T) {
 	dir1 := t.TempDir()
 	dir2 := t.TempDir()
