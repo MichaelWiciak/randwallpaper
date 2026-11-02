@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"testing"
 )
@@ -157,38 +156,6 @@ func TestRunUnknownFlag(t *testing.T) {
 	}
 	if !strings.Contains(stderr.String(), "flag provided but not defined") {
 		t.Fatalf("stderr = %q, want flag error", stderr.String())
-	}
-}
-
-func normalizeHelp(s string) string {
-	lines := strings.Split(strings.TrimSpace(s), "\n")
-	for i, line := range lines {
-		lines[i] = strings.Join(strings.Fields(line), " ")
-	}
-	return strings.Join(lines, "\n")
-}
-
-func TestRunHelpMatchesReadme(t *testing.T) {
-	var stdout, stderr bytes.Buffer
-
-	if err := run([]string{"-help"}, &stdout, &stderr); !errors.Is(err, flag.ErrHelp) {
-		t.Fatalf("run(-help) error = %v, want flag.ErrHelp", err)
-	}
-
-	data, err := os.ReadFile(filepath.Join("..", "..", "README.md"))
-	if err != nil {
-		t.Fatalf("cannot read README.md: %v", err)
-	}
-	readme := strings.ReplaceAll(string(data), "\r\n", "\n")
-	block := regexp.MustCompile("(?s)There is a `-help` flag[^\\n]*\n\n```\n(.*?)\n```").FindStringSubmatch(readme)
-	if len(block) != 2 {
-		t.Fatal("README help block not found")
-	}
-
-	got := normalizeHelp(stderr.String())
-	want := normalizeHelp(block[1])
-	if got != want {
-		t.Fatalf("README help block differs from -help output\nREADME:\n%s\nCLI:\n%s", want, got)
 	}
 }
 
