@@ -1,6 +1,7 @@
 package randwallpaper
 
 import (
+	"errors"
 	"fmt"
 	"image"
 	"image/png"
@@ -288,6 +289,31 @@ func TestGeneratePNG(t *testing.T) {
 	b := img.Bounds()
 	if b.Dx() != 50 || b.Dy() != 30 {
 		t.Fatalf("image bounds = %dx%d, expected 50x30", b.Dx(), b.Dy())
+	}
+}
+
+func TestGenerateOutputExtension(t *testing.T) {
+	tests := []struct {
+		name   string
+		output string
+		want   string
+	}{
+		{name: "without extension", output: "img", want: "img.png"},
+		{name: "with extension", output: "img.png", want: "img.png"},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			dir := t.TempDir()
+			if err := Generate(8, 8, filepath.Join(dir, tc.output), WithSeed(42)); err != nil {
+				t.Fatalf("Generate failed: %v", err)
+			}
+			if _, err := os.Stat(filepath.Join(dir, tc.want)); err != nil {
+				t.Fatalf("expected output file %q: %v", tc.want, err)
+			}
+			if _, err := os.Stat(filepath.Join(dir, tc.want+".png")); !errors.Is(err, os.ErrNotExist) {
+				t.Fatalf("unexpected double extension file: %v", err)
+			}
+		})
 	}
 }
 
