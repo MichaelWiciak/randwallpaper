@@ -159,14 +159,6 @@ func TestRunUnknownFlag(t *testing.T) {
 	}
 }
 
-func normalizeHelp(s string) string {
-	lines := strings.Split(strings.TrimSpace(s), "\n")
-	for i, line := range lines {
-		lines[i] = strings.Join(strings.Fields(line), " ")
-	}
-	return strings.Join(lines, "\n")
-}
-
 func TestRunHelp(t *testing.T) {
 	var stdout, stderr bytes.Buffer
 
