@@ -119,12 +119,11 @@ jobs:
             echo "::error::Total coverage ${total}% is below the ${COVERAGE_THRESHOLD}% threshold."
             exit 1
           fi
-
-      - uses: actions/upload-artifact@v4
-        if: always()
+      
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          name: coverage
-          path: coverage.out
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   fuzz:
     name: fuzz (smoke)
