@@ -59,8 +59,6 @@ Every call to `Generate` produces a unique colourmap.
 
 ## Installation
 
-Requires Go 1.22 or later when installing with `go install` or building from source.
-
 ### Homebrew
 
 ```bash
@@ -94,7 +92,7 @@ randwallpaper -w 1920 -h 1080 -out batch -count 10
 randwallpaper -w 800 -h 600 -out test -seed 42
 ```
 
-There is a `-help` flag that specifies the usage of the binary. `-w` and `-h` are shorthands for `-width` and `-height`.
+There is a `-h` flag that specifies the usage of the binary.
 
 ```
 Usage: randwallpaper [options]
@@ -156,23 +154,6 @@ err := randwallpaper.Generate(3840, 2160, "batch", randwallpaper.WithCount(10))
 err := randwallpaper.Generate(800, 600, "fixed", randwallpaper.WithSeed(42))
 ```
 
-## Project structure
-
-```
-randwallpaper/
-├── go.mod                  # module definition + dependencies
-├── randwallpaper.go        # public API: Generate(), Option, WithCount, WithSeed
-├── mask.go                 # mask interface + SaltPepper, Normal, GaussianBlob
-├── path.go                 # path interface + EPWT, Probabilistic
-├── colourmap.go            # colourmap type + procedural colourmap generation
-├── randwallpaper_test.go   # unit and integration tests
-├── fuzz_test.go            # path/colourmap property and fuzz tests
-└── cmd/
-    └── randwallpaper/
-        ├── main.go         # CLI binary
-        └── main_test.go    # CLI tests
-```
-
 ## Dependencies
 
 - `github.com/disintegration/imaging` - Gaussian blur for `GaussianBlobMask`
@@ -202,8 +183,6 @@ Fuzz the path and colourmap invariants:
 go test -run=^$ -fuzz=FuzzPathCoverage -fuzztime=30s .
 go test -run=^$ -fuzz=FuzzColourmap -fuzztime=30s .
 ```
-
-CI runs these checks on Linux, macOS, and Windows, plus the latest stable Go release. Generated images are automatically gitignored.
 
 ## License
 
