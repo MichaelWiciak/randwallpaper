@@ -1,6 +1,7 @@
 package randwallpaper
 
 import (
+	"errors"
 	"fmt"
 	"image"
 	"image/png"
@@ -291,6 +292,31 @@ func TestGeneratePNG(t *testing.T) {
 	}
 }
 
+func TestGenerateOutputExtension(t *testing.T) {
+	tests := []struct {
+		name   string
+		output string
+		want   string
+	}{
+		{name: "without extension", output: "img", want: "img.png"},
+		{name: "with extension", output: "img.png", want: "img.png"},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			dir := t.TempDir()
+			if err := Generate(8, 8, filepath.Join(dir, tc.output), WithSeed(42)); err != nil {
+				t.Fatalf("Generate failed: %v", err)
+			}
+			if _, err := os.Stat(filepath.Join(dir, tc.want)); err != nil {
+				t.Fatalf("expected output file %q: %v", tc.want, err)
+			}
+			if _, err := os.Stat(filepath.Join(dir, tc.want+".png")); !errors.Is(err, os.ErrNotExist) {
+				t.Fatalf("unexpected double extension file: %v", err)
+			}
+		})
+	}
+}
+
 func TestGenerateCount(t *testing.T) {
 	dir := t.TempDir()
 	out := filepath.Join(dir, "batch")
@@ -311,6 +337,32 @@ func TestGenerateCount(t *testing.T) {
 		if err != nil {
 			t.Fatalf("batch file %d is not valid PNG: %v", i, err)
 		}
+	}
+}
+
+func TestGenerateBatchRejectsEmptyBasename(t *testing.T) {
+	tests := []struct {
+		name   string
+		output string
+	}{
+		{name: "extension only", output: ".png"},
+		{name: "extension only in directory", output: filepath.Join("pictures", ".png")},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			dir := t.TempDir()
+			err := Generate(8, 8, filepath.Join(dir, tc.output), WithCount(2), WithSeed(42))
+			if err == nil {
+				t.Fatalf("Generate(%q) = nil, expected an error", tc.output)
+			}
+			entries, readErr := os.ReadDir(dir)
+			if readErr != nil {
+				t.Fatalf("cannot read output directory: %v", readErr)
+			}
+			if len(entries) != 0 {
+				t.Fatalf("expected no files or directories to be created, got %v", entries)
+			}
+		})
 	}
 }
 

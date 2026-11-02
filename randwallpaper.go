@@ -16,6 +16,7 @@ import (
 	"math/rand/v2"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -40,6 +41,20 @@ func WithSeed(seed int64) Option {
 	return func(c *config) {
 		c.seed = seed
 	}
+}
+
+func withPNGExt(name string) string {
+	if strings.EqualFold(filepath.Ext(name), ".png") {
+		return name
+	}
+	return name + ".png"
+}
+
+func withoutPNGExt(name string) string {
+	if ext := filepath.Ext(name); strings.EqualFold(ext, ".png") {
+		return strings.TrimSuffix(name, ext)
+	}
+	return name
 }
 
 func generateImage(width, height int, rng *rand.Rand) *image.NRGBA {
@@ -80,13 +95,17 @@ func Generate(width, height int, output string, opts ...Option) error {
 	saveSingle := func(idx int, rng *rand.Rand) error {
 		var filename string
 		if cfg.count == 1 {
-			filename = output + ".png"
+			filename = withPNGExt(output)
 		} else {
-			dir := output
+			dir := withoutPNGExt(output)
+			base := withoutPNGExt(filepath.Base(output))
+			if base == "" {
+				return fmt.Errorf("randwallpaper: output name %q has no base name", output)
+			}
 			if err := os.MkdirAll(dir, 0755); err != nil {
 				return fmt.Errorf("randwallpaper: cannot create output directory: %w", err)
 			}
-			filename = filepath.Join(dir, fmt.Sprintf("%s_%d.png", filepath.Base(output), idx))
+			filename = filepath.Join(dir, fmt.Sprintf("%s_%d.png", base, idx))
 		}
 		f, err := os.Create(filename)
 		if err != nil {

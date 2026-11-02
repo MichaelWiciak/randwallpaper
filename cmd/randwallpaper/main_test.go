@@ -72,6 +72,23 @@ func TestRunSingleOutput(t *testing.T) {
 	}
 }
 
+func TestRunSingleOutputWithExtension(t *testing.T) {
+	dir := t.TempDir()
+	output := filepath.Join(dir, "wallpaper.png")
+	var stdout, stderr bytes.Buffer
+
+	err := run([]string{"-w", "8", "-h", "8", "-seed", "42", "-out", output}, &stdout, &stderr)
+	if err != nil {
+		t.Fatalf("run failed: %v", err)
+	}
+	if _, err := os.Stat(output); err != nil {
+		t.Fatalf("expected single output file: %v", err)
+	}
+	if _, err := os.Stat(output + ".png"); !errors.Is(err, os.ErrNotExist) {
+		t.Fatal("output name should not get a second .png extension")
+	}
+}
+
 func TestRunSeedReproducibility(t *testing.T) {
 	dir1 := t.TempDir()
 	dir2 := t.TempDir()
