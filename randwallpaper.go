@@ -98,10 +98,14 @@ func Generate(width, height int, output string, opts ...Option) error {
 			filename = withPNGExt(output)
 		} else {
 			dir := withoutPNGExt(output)
+			base := withoutPNGExt(filepath.Base(output))
+			if base == "" {
+				return fmt.Errorf("randwallpaper: output name %q has no base name", output)
+			}
 			if err := os.MkdirAll(dir, 0755); err != nil {
 				return fmt.Errorf("randwallpaper: cannot create output directory: %w", err)
 			}
-			filename = filepath.Join(dir, fmt.Sprintf("%s_%d.png", filepath.Base(dir), idx))
+			filename = filepath.Join(dir, fmt.Sprintf("%s_%d.png", base, idx))
 		}
 		f, err := os.Create(filename)
 		if err != nil {
