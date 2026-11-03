@@ -1,6 +1,11 @@
 package randwallpaper
 
-import "math"
+import (
+	"math"
+	"runtime"
+	"sync"
+	"sync/atomic"
+)
 
 func gaussianBlur(src []uint8, width, height int, sigma float64) []uint8 {
 	dst := make([]uint8, len(src))
@@ -17,7 +22,7 @@ func gaussianBlur(src []uint8, width, height int, sigma float64) []uint8 {
 	}
 
 	tmp := make([]uint8, len(src))
-	for y := range height {
+	parallelFor(height, func(y int) {
 		for x := range width {
 			lo := max(0, x-radius)
 			hi := min(width-1, x+radius)
@@ -31,9 +36,9 @@ func gaussianBlur(src []uint8, width, height int, sigma float64) []uint8 {
 				tmp[y*width+x] = clampByte(r * (1 / a))
 			}
 		}
-	}
+	})
 
-	for y := range height {
+	parallelFor(height, func(y int) {
 		lo := max(0, y-radius)
 		hi := min(height-1, y+radius)
 		for x := range width {
@@ -47,9 +52,35 @@ func gaussianBlur(src []uint8, width, height int, sigma float64) []uint8 {
 				dst[y*width+x] = clampByte(r * (1 / a))
 			}
 		}
-	}
+	})
 
 	return dst
+}
+
+func parallelFor(n int, fn func(int)) {
+	workers := min(runtime.GOMAXPROCS(0), n)
+	if workers <= 1 {
+		for i := range n {
+			fn(i)
+		}
+		return
+	}
+	var next atomic.Int64
+	var wg sync.WaitGroup
+	wg.Add(workers)
+	for range workers {
+		go func() {
+			defer wg.Done()
+			for {
+				i := int(next.Add(1)) - 1
+				if i >= n {
+					return
+				}
+				fn(i)
+			}
+		}()
+	}
+	wg.Wait()
 }
 
 func absInt(v int) int {
