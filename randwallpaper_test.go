@@ -1,8 +1,10 @@
 package randwallpaper
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
+	"hash/fnv"
 	"image"
 	"image/png"
 	"math"
@@ -12,6 +14,8 @@ import (
 	"slices"
 	"testing"
 )
+
+const gaussianBlobMaskGoldenHash = 0x95bc71858031815
 
 func TestSaltPepperMask(t *testing.T) {
 	rng := rand.New(rand.NewPCG(42, 1))
@@ -107,6 +111,45 @@ func TestGaussianBlobMaskDeterministic(t *testing.T) {
 				t.Fatalf("deterministic gaussianBlobMask mismatch at (%d,%d)", x, y)
 			}
 		}
+	}
+}
+
+func TestGaussianBlobMaskGolden(t *testing.T) {
+	m := newGaussianBlobMask(16, 16, rand.New(rand.NewPCG(42, 1)))
+	h := fnv.New64a()
+	var buf [8]byte
+	for _, v := range m.data {
+		binary.LittleEndian.PutUint64(buf[:], math.Float64bits(v))
+		_, _ = h.Write(buf[:])
+	}
+	if got := h.Sum64(); got != gaussianBlobMaskGoldenHash {
+		t.Fatalf("seeded GaussianBlobMask output changed: hash %#x, want %#x from the previous imaging.Blur implementation",
+			got, gaussianBlobMaskGoldenHash)
+	}
+}
+
+func TestGaussianBlurImpulseSpread(t *testing.T) {
+	const (
+		width  = 11
+		height = 11
+		cx     = 5
+		cy     = 5
+	)
+	src := make([]uint8, width*height)
+	src[cy*width+cx] = 255
+	got := gaussianBlur(src, width, height, 1.5)
+
+	if got[cy*width+cx] == 0 {
+		t.Fatal("impulse center was erased")
+	}
+	if got[cy*width+cx-1] == 0 || got[cy*width+cx+1] == 0 {
+		t.Fatal("impulse did not spread horizontally")
+	}
+	if got[(cy-1)*width+cx] == 0 || got[(cy+1)*width+cx] == 0 {
+		t.Fatal("impulse did not spread vertically")
+	}
+	if got[(cy-2)*width+cx] == 0 {
+		t.Fatal("impulse did not spread vertically beyond one row")
 	}
 }
 
