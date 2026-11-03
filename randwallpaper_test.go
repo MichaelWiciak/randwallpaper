@@ -1,16 +1,21 @@
 package randwallpaper
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
+	"hash/fnv"
 	"image"
 	"image/png"
 	"math"
 	"math/rand/v2"
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 )
+
+const gaussianBlobMaskGoldenHash = 0x95bc71858031815
 
 func TestSaltPepperMask(t *testing.T) {
 	rng := rand.New(rand.NewPCG(42, 1))
@@ -82,8 +87,8 @@ func TestGaussianBlobMask(t *testing.T) {
 	for y := range 30 {
 		for x := range 50 {
 			v := m.At(x, y)
-			if v < 0 || v > 1 {
-				t.Fatalf("gaussianBlobMask value at (%d,%d) = %f, expected [0,1]", x, y, v)
+			if math.IsNaN(v) || math.IsInf(v, 0) || v < 0 || v > 1 {
+				t.Fatalf("gaussianBlobMask value at (%d,%d) = %f, expected finite value in [0,1]", x, y, v)
 			}
 			if v > 0 {
 				hasNonZero = true
@@ -106,6 +111,107 @@ func TestGaussianBlobMaskDeterministic(t *testing.T) {
 				t.Fatalf("deterministic gaussianBlobMask mismatch at (%d,%d)", x, y)
 			}
 		}
+	}
+}
+
+func TestGaussianBlobMaskGolden(t *testing.T) {
+	m := newGaussianBlobMask(16, 16, rand.New(rand.NewPCG(42, 1)))
+	h := fnv.New64a()
+	var buf [8]byte
+	for _, v := range m.data {
+		binary.LittleEndian.PutUint64(buf[:], math.Float64bits(v))
+		_, _ = h.Write(buf[:])
+	}
+	if got := h.Sum64(); got != gaussianBlobMaskGoldenHash {
+		t.Fatalf("seeded GaussianBlobMask output changed: hash %#x, want %#x from the previous imaging.Blur implementation",
+			got, gaussianBlobMaskGoldenHash)
+	}
+}
+
+func TestGaussianBlurImpulseSpread(t *testing.T) {
+	const (
+		width  = 11
+		height = 11
+		cx     = 5
+		cy     = 5
+	)
+	src := make([]uint8, width*height)
+	src[cy*width+cx] = 255
+	got := gaussianBlur(src, width, height, 1.5)
+
+	if got[cy*width+cx] == 0 {
+		t.Fatal("impulse center was erased")
+	}
+	if got[cy*width+cx-1] == 0 || got[cy*width+cx+1] == 0 {
+		t.Fatal("impulse did not spread horizontally")
+	}
+	if got[(cy-1)*width+cx] == 0 || got[(cy+1)*width+cx] == 0 {
+		t.Fatal("impulse did not spread vertically")
+	}
+	if got[(cy-2)*width+cx] == 0 {
+		t.Fatal("impulse did not spread vertically beyond one row")
+	}
+}
+
+func TestGaussianBlurConstantField(t *testing.T) {
+	for _, value := range []uint8{0, 1, 127, 255} {
+		for _, sigma := range []float64{1, 2.5, 10} {
+			src := make([]uint8, 7*5)
+			for i := range src {
+				src[i] = value
+			}
+			got := gaussianBlur(src, 7, 5, sigma)
+			for i, v := range got {
+				if v != value {
+					t.Fatalf("value=%d sigma=%f index=%d: got %d", value, sigma, i, v)
+				}
+			}
+		}
+	}
+}
+
+func TestGaussianBlurEdgeDimensions(t *testing.T) {
+	dims := []image.Point{
+		{1, 1}, {1, 5}, {5, 1}, {1, 32}, {32, 1},
+		{2, 2}, {3, 5}, {5, 3}, {17, 9}, {9, 17},
+	}
+	for _, dim := range dims {
+		src := make([]uint8, dim.X*dim.Y)
+		for i := range src {
+			if i%3 == 0 {
+				src[i] = 255
+			}
+		}
+		got := gaussianBlur(src, dim.X, dim.Y, 3)
+		if len(got) != len(src) {
+			t.Fatalf("dim=%v: length %d, expected %d", dim, len(got), len(src))
+		}
+	}
+}
+
+func TestGaussianBlurEdgeCases(t *testing.T) {
+	src := []uint8{1, 2, 3, 4}
+	if got := gaussianBlur(src, 2, 2, 0); !slices.Equal(got, src) {
+		t.Fatalf("sigma=0: got %v, expected %v", got, src)
+	}
+	if got := gaussianBlur(src, 0, 2, 1); !slices.Equal(got, src) {
+		t.Fatalf("zero width: got %v, expected %v", got, src)
+	}
+	if got := gaussianBlur(src, 2, 0, 1); !slices.Equal(got, src) {
+		t.Fatalf("zero height: got %v, expected %v", got, src)
+	}
+}
+
+func TestGaussianBlurDeterministic(t *testing.T) {
+	src := make([]uint8, 23*11)
+	rng := rand.New(rand.NewPCG(5, 6))
+	for i := range src {
+		src[i] = uint8(rng.IntN(256))
+	}
+	a := gaussianBlur(src, 23, 11, 4.5)
+	b := gaussianBlur(src, 23, 11, 4.5)
+	if !slices.Equal(a, b) {
+		t.Fatal("gaussianBlur is not deterministic")
 	}
 }
 
@@ -262,6 +368,30 @@ func TestClampF64(t *testing.T) {
 		got := clampF64(tc.in)
 		if got != tc.out {
 			t.Errorf("clampF64(%f) = %f, expected %f", tc.in, got, tc.out)
+		}
+	}
+}
+
+func TestClampByte(t *testing.T) {
+	tests := []struct {
+		in   float64
+		want uint8
+	}{
+		{-1, 0},
+		{-0.5, 0},
+		{0, 0},
+		{0.4, 0},
+		{0.5, 1},
+		{1.4, 1},
+		{127.6, 128},
+		{255, 255},
+		{255.4, 255},
+		{255.5, 255},
+		{300, 255},
+	}
+	for _, tc := range tests {
+		if got := clampByte(tc.in); got != tc.want {
+			t.Errorf("clampByte(%f) = %d, expected %d", tc.in, got, tc.want)
 		}
 	}
 }
@@ -533,5 +663,12 @@ func BenchmarkProbabilisticPath(b *testing.B) {
 func BenchmarkGenerate(b *testing.B) {
 	for range b.N {
 		_ = generateImage(128, 128, rand.New(rand.NewPCG(42, 1)))
+	}
+}
+
+func BenchmarkGaussianBlobMask(b *testing.B) {
+	for range b.N {
+		rng := rand.New(rand.NewPCG(42, 1))
+		_ = newGaussianBlobMask(128, 128, rng)
 	}
 }
