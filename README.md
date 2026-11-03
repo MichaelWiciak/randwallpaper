@@ -154,10 +154,6 @@ err := randwallpaper.Generate(3840, 2160, "batch", randwallpaper.WithCount(10))
 err := randwallpaper.Generate(800, 600, "fixed", randwallpaper.WithSeed(42))
 ```
 
-## Dependencies
-
-- `github.com/disintegration/imaging` - Gaussian blur for `GaussianBlobMask`
-
 ## Development
 
 Run the CLI directly from the repo without building the binary every time:
