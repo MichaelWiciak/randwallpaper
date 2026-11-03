@@ -1,12 +1,8 @@
 package randwallpaper
 
 import (
-	"image"
-	"image/color"
 	"math"
 	"math/rand/v2"
-
-	"github.com/disintegration/imaging"
 )
 
 type mask interface {
@@ -75,24 +71,21 @@ func newGaussianBlobMask(width, height int, rng *rand.Rand) *gaussianBlobMask {
 	nCenters := rng.IntN(centerMax) + 1
 	sigma := rng.IntN(sigmaMax) + 1
 
-	img := image.NewGray(image.Rect(0, 0, width, height))
+	centers := make([]uint8, n)
 	for range nCenters {
 		cx := rng.IntN(width)
 		cy := rng.IntN(height)
-		img.SetGray(cx, cy, color.Gray{Y: 255})
+		centers[cy*width+cx] = 255
 	}
 
-	blurred := imaging.Blur(img, float64(sigma))
+	blurred := gaussianBlur(centers, width, height, float64(sigma))
 	data := make([]float64, n)
 	maxVal := 0.0
-	for y := range height {
-		for x := range width {
-			r, g, b, _ := blurred.At(x, y).RGBA()
-			v := float64((r + g + b) / 3 / 257)
-			data[y*width+x] = v
-			if v > maxVal {
-				maxVal = v
-			}
+	for i, v := range blurred {
+		f := float64(v)
+		data[i] = f
+		if f > maxVal {
+			maxVal = f
 		}
 	}
 	if maxVal > 0 {
