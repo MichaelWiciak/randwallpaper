@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.3.0](https://github.com/MichaelWiciak/randwallpaper/compare/v1.2.1...v1.3.0) (2026-11-03)
+
+
+### Features
+
+* add guassian blur implementation ([c937ed2](https://github.com/MichaelWiciak/randwallpaper/commit/c937ed2732b0980cb4a2aa475c70276745fd10cb))
+* parallelise blur ([b0da823](https://github.com/MichaelWiciak/randwallpaper/commit/b0da82315b79d5063605165086325775524aecd5))
+* replace disintegration usage with own blur ([49a902e](https://github.com/MichaelWiciak/randwallpaper/commit/49a902eb4b44ca44d6a30bf083d6314f92549f55))
+
 ## [1.2.1](https://github.com/MichaelWiciak/randwallpaper/compare/v1.2.0...v1.2.1) (2026-11-02)
 
 
