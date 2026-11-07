@@ -18,6 +18,18 @@ go run honnef.co/go/tools/cmd/staticcheck@v0.8.2 ./...
 go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
 ```
 
+## Git hooks
+
+This repo has optional hooks in `.githooks/`. Enable them once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+- `pre-commit` — runs `gofmt` on staged Go files and `go vet ./...`.
+- `commit-msg` — enforces the Conventional Commits format below.
+- `pre-push` — runs `go test -race ./...`, `staticcheck`, and `govulncheck`.
+
 ## Development workflow
 
 1. Create a feature branch from `main`.
