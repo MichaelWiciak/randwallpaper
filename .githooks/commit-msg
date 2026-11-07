@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+msg_file="${1:?commit-msg hook requires the commit message file}"
+
+subject=""
+while IFS= read -r line; do
+  case "$line" in
+    '' | '#'*) continue ;;
+  esac
+  subject="$line"
+  break
+done < "$msg_file"
+
+case "$subject" in
+  Merge* | Revert* | fixup!* | squash!* | amend!*) exit 0 ;;
+esac
+
+pattern='^(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)(\([^)]+\))?!?: .+'
+
+if ! [[ "$subject" =~ $pattern ]]; then
+  echo "commit-msg: commit subject does not follow Conventional Commits." >&2
+  echo "  got: $subject" >&2
+  echo "  expected: <type>[(scope)][!]: <description>" >&2
+  echo "  types: feat fix chore docs style refactor perf test build ci revert" >&2
+  echo "  see CONTRIBUTING.md#commit-messages" >&2
+  exit 1
+fi
