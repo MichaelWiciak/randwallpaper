@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+STATICCHECK_VERSION="v0.8.2"
+GOVULNCHECK_VERSION="v1.9.0"
+
+echo "pre-push: go test -race ./..."
+go test -race ./...
+
+echo "pre-push: staticcheck"
+go run "honnef.co/go/tools/cmd/staticcheck@${STATICCHECK_VERSION}" ./...
+
+echo "pre-push: govulncheck"
+go run "golang.org/x/vuln/cmd/govulncheck@${GOVULNCHECK_VERSION}" ./...

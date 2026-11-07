@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+staged=()
+while IFS= read -r -d '' file; do
+  staged+=("$file")
+done < <(git diff --cached --name-only --diff-filter=ACMR -z -- '*.go')
+
+if [ "${#staged[@]}" -eq 0 ]; then
+  exit 0
+fi
+
+unformatted=$(gofmt -l "${staged[@]}")
+if [ -n "$unformatted" ]; then
+  echo "pre-commit: the following staged files are not gofmt-formatted:" >&2
+  echo "$unformatted" >&2
+  echo "Run 'gofmt -w <file>' and stage the result." >&2
+  exit 1
+fi
+
+echo "pre-commit: go vet ./..."
+go vet ./...
