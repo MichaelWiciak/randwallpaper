@@ -26,9 +26,13 @@ This repo has optional hooks in `.githooks/`. Enable them once per clone:
 git config core.hooksPath .githooks
 ```
 
-- `pre-commit` — runs `gofmt` on staged Go files and `go vet ./...`.
+- `pre-commit` — runs `gofmt` on the staged contents of Go files and `go vet ./...`.
 - `commit-msg` — enforces the Conventional Commits format below.
 - `pre-push` — runs `go test -race ./...`, `staticcheck`, and `govulncheck`.
+
+The analysers are downloaded on first run and cached in the Go module cache.
+If you are offline and they are not cached yet, the pre-push hook cannot run.
+`git push --no-verify` skips the hook
 
 ## Development workflow
 
