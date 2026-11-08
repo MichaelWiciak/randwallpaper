@@ -3,20 +3,25 @@ set -euo pipefail
 
 msg_file="${1:?commit-msg hook requires the commit message file}"
 
+comment_char=$(git config --get core.commentChar || true)
+if [ -z "$comment_char" ] || [ "$comment_char" = "auto" ]; then
+  comment_char='#'
+fi
+
 subject=""
-while IFS= read -r line; do
+while IFS= read -r line || [ -n "$line" ]; do
   case "$line" in
-    '' | '#'*) continue ;;
+    '' | "$comment_char"*) continue ;;
   esac
   subject="$line"
   break
 done < "$msg_file"
 
 case "$subject" in
-  Merge* | Revert* | fixup!* | squash!* | amend!*) exit 0 ;;
+  "Merge "* | "Revert "* | "fixup! "* | "squash! "* | "amend! "*) exit 0 ;;
 esac
 
-pattern='^(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)(\([^)]+\))?!?: .+'
+pattern='^(feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)(\([^)]+\))?!?: [^[:space:]].*$'
 
 if ! [[ "$subject" =~ $pattern ]]; then
   echo "commit-msg: commit subject does not follow Conventional Commits." >&2
