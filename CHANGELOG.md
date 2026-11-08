@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.1](https://github.com/MichaelWiciak/randwallpaper/compare/v1.3.0...v1.3.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* add commit message functionality in standards ([2dce5dd](https://github.com/MichaelWiciak/randwallpaper/commit/2dce5dd3f47a6a89485d94f9ff22397f08f466e1))
+* validation of commits being run ([2fb5fb5](https://github.com/MichaelWiciak/randwallpaper/commit/2fb5fb5c51f5da79a8db3214af50cdbb0aad943e))
+
 ## [1.3.0](https://github.com/MichaelWiciak/randwallpaper/compare/v1.2.1...v1.3.0) (2026-11-03)
 
 
